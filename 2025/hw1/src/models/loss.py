@@ -74,6 +74,13 @@ class PolicyLoss(nn.Module):
         # 根据deepseekmath, deepseek r1中的paper，实现loss函数
         # 不需要实现klloss
         ######################
+        ratio = (log_probs - old_log_probs).exp()
+        surr1 = ratio * advantages
+        surr2 = ratio.clamp(1 - self.clip_eps, 1 + self.clip_eps) * advantages
+        loss = -torch.min(surr1, surr2)
+        if action_mask != None:
+            loss = masked_mean(loss, action_mask)
+        loss = loss.mean()
         return loss
 
 

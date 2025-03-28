@@ -155,6 +155,13 @@ class RuleBasedRMProxy:
                 # 2.用prompt2answer获取prompt对应的groundtruth
                 # 3.用math_equal函数评估response是否正确，并据此给出reward
                 ######################
+                answer = self.boxed_pattern.findall(response)[0]
+                groundtruth = self.prompt2answer[prompt]
+                equal = math_equal(answer, groundtruth)
+                if equal:
+                    score = 1.0
+                else:
+                    score = -1.0
                 return score
                 
         except TimeoutException:
